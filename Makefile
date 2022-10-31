@@ -2,7 +2,7 @@
 CXX = g++
 #CFLAGS = -O2 -g -D_REENTERANT
 #LDLIBS = -lpthread
-OBJ1 = main.o User.o Customer_Manager.o
+OBJ1 = main.o User.o Customer_Manager.o board.o
 OBJ2 = main_c.o
 
 SRCS = $(OBJS1:.o=.c) $(OBJS2:.o=.c)
@@ -22,3 +22,4 @@ main.o : main.cpp
 User.o : User.h User.cpp
 Customer_Manager.o : Customer_Manager.h Customer_Manager.cpp
 main_c.o : main_c.cpp
+board.o : board.cpp

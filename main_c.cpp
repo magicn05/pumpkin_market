@@ -1,16 +1,14 @@
 
-// Pumpkin Market Client
+// Client
 
 #include "Customer_Manager.h"
 #include "User.h"
 #include <arpa/inet.h>
 #include <cstring>
 #include <error.h>
-#include <string.h>
 #include <iostream>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <pthread.h>
 #include <string>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -18,59 +16,47 @@
 #include <thread>
 #include <unistd.h>
 
-#define MAXDATASIZE 1024
+#define MAX_DATA_SIZE 1024
 
-
+using namespace std;
 
 void recv_thread(int new_fd) {
   cout << "recv thread on " << endl;
-  char name_msg[1024];
-  int str_len;
+  char recv_msg[MAX_DATA_SIZE];
   while (1) {
-    recv(new_fd, name_msg, 1024, 0);
-    cout << "from server : " << name_msg << endl;
+    recv(new_fd, recv_msg, MAX_DATA_SIZE, 0);
+    cout << recv_msg << endl;
   }
 }
+
 void send_thread(int new_fd) {
   cout << "send thread on " << endl;
-  char buf[1024];
-  //string temp;
+  char send_msg[MAX_DATA_SIZE];
   while (1) {
-     cin >> buf;
-     send(new_fd, buf, 1024, 0);
+    cin >> send_msg;
+    send(new_fd, send_msg, MAX_DATA_SIZE, 0);
   }
 }
-using namespace std;
-void chatting(int sd);
-int main(int argc, char *argv[]) {
-  int sockfd, numbytes;
-  socklen_t addr_len;
-  char buf[1024];
-  int state, client_len;
 
+int main(int argc, char *argv[]) {
+  int sockfd;
+  socklen_t addr_len;
+    
   struct sockaddr_in client_addr;
   struct sockaddr_in server_addr;
   struct hostent *he;
   he = gethostbyname(argv[1]);
-
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(60000);
   server_addr.sin_addr = *((struct in_addr *)he->h_addr);
-
   inet_ntoa(server_addr.sin_addr);
   memset(&(server_addr.sin_zero), '\0', 8);
-
-  if (connect(sockfd, (struct sockaddr *)&server_addr,
-              sizeof(struct sockaddr)) == -1) {
+  if (connect(sockfd, (struct sockaddr *)&server_addr,sizeof(struct sockaddr)) == -1){
     perror("connet");
     exit(1);
   }
-
-  // recv(sockfd, buf, 1024, 0);
-  cout << "start- ------" << endl;
-  // cout << buf << endl;
+  cout << "Client Start-------" << endl;
   thread recv_c(recv_thread, sockfd);
   thread send_c(send_thread, sockfd);
   recv_c.join();

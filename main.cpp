@@ -1,4 +1,4 @@
-// This is Server for Pumpkin Market"
+// Server 
 #include "Customer_Manager.h"
 #include "User.h"
 #include <arpa/inet.h>
@@ -12,13 +12,13 @@
 #include <sys/types.h>
 #include <thread>
 #include <unistd.h>
-#define MAXDATASIZE 1024
+#include "board.h"
+#define MAX_DATA_SIZE 1024
 using namespace std;
 
-/// 전역변수 영영ㅜㅜ ////
+/// 전역변수 ////
 int n = 0;
 struct sockaddr_in clientaddr;
-void chatting(int sd);
 
 class Server_Manager {
 public:
@@ -31,27 +31,32 @@ public:
   }
 };
 
-void thread_function(int new_fd) { //// server
+void thread_function(int new_fd) { 
   char buf[1024];
-  int choice;
-  cout << "Server:connection from FD: " << new_fd << " : "
-       << inet_ntoa(clientaddr.sin_addr) << endl;
+  int choice=0;
+  cout << "Server:connection from FD: " << new_fd << " : " << inet_ntoa(clientaddr.sin_addr) << endl;
   cout << "Thread On" << endl;
+  send(new_fd, "Welcome to Server!!", MAX_DATA_SIZE, 0);
+  sleep(1);
   while(1){
-  send(new_fd, "Welcome to server choose your options", 20, 0);
+  send(new_fd, "Choose your options", MAX_DATA_SIZE, 0);
+  sleep(0.5);
+  send(new_fd, "1. Board \n", MAX_DATA_SIZE, 0);
   sleep(1);
-  send(new_fd, "test 1 >>", 25, 0);
+  send(new_fd, "2. Chatting Room \n", 25, 0);
   sleep(1);
-  send(new_fd, "test 2 >>", 25, 0);
+  send(new_fd, "3. Library \n", 25, 0);
   sleep(1);
+  send(new_fd, "Input >> ", 25, 0);
   A:
-  recv(new_fd, buf, 2, 0);
-
-  choice = buf[0] - 0x30;
-  cout << "choice : " << choice << endl;
+  recv(new_fd, buf, 1024, 0); 
+  choice = atoi(buf);
+  cout << "Client choice : " << choice << endl;
+  sleep(1);
   switch(choice){
     case 1:
       send(new_fd, "client selected 1", 1024, 0);
+      board_ctl(new_fd);
       goto A;
     case 2:
       send(new_fd, "client selected 2", 1024, 0);
@@ -60,17 +65,7 @@ void thread_function(int new_fd) { //// server
       send(new_fd, "client selected none", 1024, 0);
       goto A;
   }
-  
-  send(new_fd, "Welcome to servev", 20, 0);
-  sleep(3);
-  send(new_fd, "1 test >> ", 25, 0);
-  sleep(3);
-  send(new_fd, "2 test >> ", 25, 0);
-  //recv(new_fd, buf, 1024, 0);
-  cout << "from client " << buf << endl;
-  // cin >> buf;
-  // recv(new_fd,buf,1024,0);
-  // send(new_fd, &choice, 1024,0);
+    
   n++;
   if (strcmp(buf, "z") == 0)
     cout << "n : " << n << endl;
@@ -80,18 +75,16 @@ void thread_function(int new_fd) { //// server
   }
 }
 
+
+
 int main() {
-
   cout << "S E R V E R          O N" << endl;
-
   int choice;
   int sockfd, new_fd, state;
   socklen_t client_len;
   // struct sockaddr_in clientaddr;
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
   Server_Manager Server_Set;
-
   int reuseAddress = 1;
   int option = 1;
 
