@@ -1,23 +1,48 @@
 
-//Pumpkin Market Client
+// Pumpkin Market Client
 
+#include "Customer_Manager.h"
+#include "User.h"
 #include <arpa/inet.h>
+#include <cstring>
+#include <error.h>
+#include <string.h>
 #include <iostream>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <pthread.h>
 #include <string>
 #include <sys/socket.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <netinet/in.h>
-#include "User.h"
-#include "Customer_Manager.h"
-#include <cstring>
-#include <netdb.h>
-#include <error.h>
+#include <sys/types.h>
+#include <thread>
 #include <unistd.h>
-using namespace std;
 
-int main(int argc, char* argv[])
-{
+#define MAXDATASIZE 1024
+
+
+
+void recv_thread(int new_fd) {
+  cout << "recv thread on " << endl;
+  char name_msg[1024];
+  int str_len;
+  while (1) {
+    recv(new_fd, name_msg, 1024, 0);
+    cout << "from server : " << name_msg << endl;
+  }
+}
+void send_thread(int new_fd) {
+  cout << "send thread on " << endl;
+  char buf[1024];
+  //string temp;
+  while (1) {
+     cin >> buf;
+     send(new_fd, buf, 1024, 0);
+  }
+}
+using namespace std;
+void chatting(int sd);
+int main(int argc, char *argv[]) {
   int sockfd, numbytes;
   socklen_t addr_len;
   char buf[1024];
@@ -27,39 +52,27 @@ int main(int argc, char* argv[])
   struct sockaddr_in server_addr;
   struct hostent *he;
   he = gethostbyname(argv[1]);
-  
-  sockfd = socket(AF_INET, SOCK_STREAM,0);
-   
+
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(60000);
-  server_addr.sin_addr= *((struct in_addr*)he->h_addr);
-  
+  server_addr.sin_addr = *((struct in_addr *)he->h_addr);
+
   inet_ntoa(server_addr.sin_addr);
-  memset(&(server_addr.sin_zero),'\0',8);
-  
-  if(connect(sockfd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr))==-1){
+  memset(&(server_addr.sin_zero), '\0', 8);
+
+  if (connect(sockfd, (struct sockaddr *)&server_addr,
+              sizeof(struct sockaddr)) == -1) {
     perror("connet");
     exit(1);
   }
-  //char buf[1024];
-  
-  while(1)
-  {
-    fgets(buf, 1024, stdin);
-    buf[strlen(buf)-1] = '\0';
-    write(sockfd, buf, strlen(buf));
-    
-  }
-  cout << "socket fd" << sockfd << endl;
 
-  
-
-  if((numbytes == recv(sockfd, buf, 1024,0))==-1){
-    perror("recv");
-    exit(1);
-  }  
-  buf[numbytes] = '\0';
-  cout << "recevied " << endl;
-  close(sockfd);
-  return 0;
+  // recv(sockfd, buf, 1024, 0);
+  cout << "start- ------" << endl;
+  // cout << buf << endl;
+  thread recv_c(recv_thread, sockfd);
+  thread send_c(send_thread, sockfd);
+  recv_c.join();
+  send_c.join();
 }

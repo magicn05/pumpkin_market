@@ -13,7 +13,7 @@ server: $(OBJ1)
 	$(CXX) -o server $(OBJ1) -lpthread
 
 client: $(OBJ2)
-	$(CXX) -o client $(OBJ2)
+	$(CXX) -o client $(OBJ2) -lpthread
 
 clean :
 	rm -rf $(OBJ1) $(OBJ2) server client core final
