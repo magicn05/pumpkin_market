@@ -9,7 +9,7 @@ int add(int sd)
     int a,b,n;
 	char buf[1024];
     
-    sprintf(buf,"%s", "더하기 메뉴입니다\n\n");
+    sprintf(buf,"%s", "더하기 메뉴이다\n\n");
 	send(sd, buf, strlen(buf), 0);
 
     sprintf(buf, "%s", "a = ");
