@@ -23,19 +23,32 @@ using namespace std;
 void recv_thread(int new_fd) {
   cout << "recv thread on " << endl;
   char recv_msg[MAX_DATA_SIZE];
+  int n;
   while (1) {
-    recv(new_fd, recv_msg, MAX_DATA_SIZE, 0);
+    n = recv(new_fd, recv_msg, MAX_DATA_SIZE, 0);
+    if (n<=0){
+      cout << "Disconnected from server" << endl;
+      break;
+    }
+    recv_msg[n] = '\0';
     cout << recv_msg << endl;
+    fflush(stdout);
   }
+  //c++에서는 thread cancle / exit 없음.
 }
 
 void send_thread(int new_fd) {
   cout << "send thread on " << endl;
+  int n;
   char send_msg[MAX_DATA_SIZE];
   while (1) {
     cin >> send_msg;
+    n = strlen(send_msg);
+    if(!strcmp(send_msg,"/q"))
+      break;
     send(new_fd, send_msg, MAX_DATA_SIZE, 0);
   }
+  //c++에서는 thread cancle / exit 없음.
 }
 
 int main(int argc, char *argv[]) {
@@ -61,4 +74,5 @@ int main(int argc, char *argv[]) {
   thread send_c(send_thread, sockfd);
   recv_c.join();
   send_c.join();
+  close(sockfd);
 }
