@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-int sub(int sd)
+extern "C" int sub(int sd)
 {
     int a,b,n;
 	char buf[1024];

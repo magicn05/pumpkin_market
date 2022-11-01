@@ -1,5 +1,5 @@
 INC = ../include
-#CXX = g++
+CXX = g++
 CFLAGS = -fPIC -c  -g
 LDFLAGS = -L../libsrc -lmenu -lhash -lpthread -ldl
 #LDFLAGS = -L../../lib -lmenu -lprofile -lhash -lio  -lpthread
@@ -9,22 +9,19 @@ OBJS = add.o sub.o
 all: server libadd.so libsub.so
 
 server: server.o
-	$(CC) -o $@ $@.o $(LDFLAGS)
+	$(CXX) -o $@ $@.o $(LDFLAGS)
 #	cp $@ ../../bin/
 
-server.o: server.c
-	$(CC) -c -I$(INC) -g $<
+server.o: server.cpp
+	$(CXX) -c -I$(INC) -g $<
 
 libadd.so: add.o 
-	$(LD) -shared -o $@ $<
+	$(CXX) -shared -fPIC -o $@ $<
 #	cp lib$@.so ../../bin/
 
 libsub.so: sub.o 
-	$(LD) -shared -o $@ $<
+	$(CXX) -shared -fPIC -o $@ $<
 #	cp lib$@.so ../../bin/
-
-.c.o:
-	$(CC) $(CFLAGS) -I$(INC) $< 
 
 clean:
 	rm *.o lib*.so server 
