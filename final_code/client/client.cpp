@@ -97,15 +97,8 @@
 //   pthread_cancel(tid2);
 //   pthread_exit(NULL);
 // }
-
-
-
 // Client
-
-
-
 #include <arpa/inet.h>
-#include <cstring>
 #include <error.h>
 #include <iostream>
 #include <netdb.h>
@@ -117,6 +110,7 @@
 #include <thread>
 #include <unistd.h>
 #include <pthread.h>
+#include <cstring>
 
 #define MAX_DATA_SIZE 1024
 
@@ -131,15 +125,19 @@ void *recv_thread(void *arg) {
   int n;
   while (1) {
     n = recv(new_fd, recv_msg, MAX_DATA_SIZE, 0);
-    
     if (n<=0){
-      cout << "Disconnected from server" << endl;
-      break;
+    cout << "Disconnected from server" << endl;
+    break;
     }
     recv_msg[n] = '\0';
-    cout << recv_msg;
+    if (strcmp(recv_msg, "WINDOW")==0){
+    system("clear");
+    }
+    else 
+      cout << recv_msg;
     fflush(stdout);
   }
+  pthread_cancel(tid2);
   pthread_cancel(tid1);
   pthread_exit(NULL);
   
@@ -194,4 +192,5 @@ int main(int argc, char *argv[]) {
   pthread_join(tid1, NULL);
   pthread_join(tid2, NULL);
   close(sockfd);
+  return 0;
 }

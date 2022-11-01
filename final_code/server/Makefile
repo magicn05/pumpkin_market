@@ -15,11 +15,11 @@ server: server.o
 server.o: server.cpp
 	$(CXX) -c -I$(INC) -g $<
 
-libadd.so: add.o 
+libadd.so: add.o
 	$(CXX) -shared -fPIC -o $@ $<
 #	cp lib$@.so ../../bin/
 
-libsub.so: sub.o 
+libsub.so: sub.o
 	$(CXX) -shared -fPIC -o $@ $<
 #	cp lib$@.so ../../bin/
 
